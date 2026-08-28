@@ -1,0 +1,16 @@
+[submodule "components/frontend"]
+	path = components/frontend
+	url = https://github.com/dib-B101/dib-frontend.git
+	branch = main
+[submodule "components/backend"]
+	path = components/backend
+	url = https://github.com/dib-B101/dib-backend.git
+	branch = main
+[submodule "components/ai"]
+	path = components/ai
+	url = https://github.com/dib-B101/dib-ai.git
+	branch = main
+[submodule "components/infra"]
+	path = components/infra
+	url = https://github.com/dib-B101/dib-infra.git
+	branch = main
