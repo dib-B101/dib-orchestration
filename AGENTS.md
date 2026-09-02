@@ -12,6 +12,7 @@
 - 설계 문서 목록: `docs/design-docs/index.md`
 - 작업 계획 규칙: `docs/PLANS.md`
 - Git Flow 및 커밋 정책: `docs/GIT_FLOW.md`
+- GitLab 백업 및 통합 동기화: `docs/GITLAB_SYNC.md`
 - 테스트 전략: `docs/TEST_STRATEGY.md`
 - 배포 절차: `docs/DEPLOYMENT.md`
 - 시연 절차: `docs/DEMO_RUNBOOK.md`

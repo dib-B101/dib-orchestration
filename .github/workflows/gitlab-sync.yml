@@ -1,0 +1,58 @@
+name: Synchronize GitLab
+
+on:
+  push:
+    branches:
+      - "**"
+    tags:
+      - "**"
+  delete:
+  schedule:
+    - cron: "5 */6 * * *"
+  workflow_dispatch:
+    inputs:
+      integration_branch:
+        description: Integrated branch to rebuild
+        required: true
+        default: all
+        type: choice
+        options:
+          - all
+          - main
+          - develop
+
+permissions:
+  contents: read
+
+jobs:
+  backup:
+    name: Back up orchestration refs
+    uses: ./.github/workflows/reusable-gitlab-backup.yml
+    with:
+      namespace: orch
+      tools_ref: ${{ github.sha }}
+    secrets: inherit
+
+  integrate-main:
+    name: Build integrated main
+    if: >-
+      github.event_name == 'schedule' ||
+      (github.event_name == 'push' && github.ref_type == 'branch' && github.ref_name == 'main') ||
+      (github.event_name == 'workflow_dispatch' &&
+       (inputs.integration_branch == 'all' || inputs.integration_branch == 'main'))
+    uses: ./.github/workflows/reusable-build-gitlab-integration.yml
+    with:
+      target_branch: main
+    secrets: inherit
+
+  integrate-develop:
+    name: Build integrated develop
+    if: >-
+      github.event_name == 'schedule' ||
+      (github.event_name == 'push' && github.ref_type == 'branch' && github.ref_name == 'develop') ||
+      (github.event_name == 'workflow_dispatch' &&
+       (inputs.integration_branch == 'all' || inputs.integration_branch == 'develop'))
+    uses: ./.github/workflows/reusable-build-gitlab-integration.yml
+    with:
+      target_branch: develop
+    secrets: inherit
