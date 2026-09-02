@@ -39,6 +39,16 @@ namespace 백업은 파일과 이력을 변경하지 않아 원본 commit SHA를
 
 각 컴포넌트 저장소는 `.github/workflows/gitlab-backup.yml`에서 공통 백업 workflow를 호출하고 저장소 식별자만 전달한다.
 
+## 자동 실행 시점
+
+- 각 GitHub 저장소에서 branch 또는 tag를 push하면 해당 namespace 백업을 갱신한다.
+- GitHub branch 또는 tag를 삭제하면 다음 실행에서 해당 namespace의 대응 ref도 삭제한다.
+- PR을 생성하는 행위 자체는 별도의 동기화 조건이 아니다. PR branch에 이미 push된 commit은 namespace 백업에 포함된다.
+- orchestration의 `main` 또는 `develop`이 merge나 직접 push로 변경되면 같은 이름의 GitLab 통합 branch를 갱신한다.
+- 예약 실행은 누락된 branch와 tag 생성·삭제를 전체 재조정한다.
+
+namespace 백업의 commit SHA, 작성자 이름, 작성자 이메일과 날짜는 GitHub 원본과 같다. GitLab의 push 활동은 인증에 사용한 PAT 소유자로 기록된다. 통합 `main`, `develop`은 여러 저장소의 파일을 조합한 별도 commit이며 orchestration tip의 작성자를 author로, `DIB Integration Sync`를 committer로 기록한다. 따라서 컴포넌트 팀원의 원본 commit 이력과 계정 연결은 namespace 백업 branch에서 확인한다.
+
 ## 최초 적용 순서
 
 1. 공통 workflow와 script를 `dib-orchestration/main`에 먼저 반영한다.
@@ -79,6 +89,7 @@ $githubSha -eq $gitlabSha
 ## 운영 규칙
 
 - GitHub에서만 branch, commit, PR, merge와 tag 작업을 수행한다.
+- 모든 팀원은 GitHub와 GitLab 양쪽에서 인증한 동일 이메일을 Git `user.email`로 사용한다.
 - GitLab에서 직접 branch, commit, MR 또는 tag를 만들지 않는다.
 - 컴포넌트 변경을 통합하려면 먼저 대상 저장소에서 병합하고 orchestration submodule 포인터를 갱신한다.
 - `develop`은 통합 검증 대상, `main`은 검증된 안정 버전으로 유지한다.
