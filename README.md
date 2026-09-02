@@ -32,6 +32,7 @@ git submodule update --init --recursive
 - 설계 문서: [`docs/design-docs/index.md`](docs/design-docs/index.md)
 - 실행 계획: [`docs/PLANS.md`](docs/PLANS.md)
 - Git Flow 정책: [`docs/GIT_FLOW.md`](docs/GIT_FLOW.md)
+- GitLab 백업 및 통합 동기화: [`docs/GITLAB_SYNC.md`](docs/GITLAB_SYNC.md)
 - 테스트 전략: [`docs/TEST_STRATEGY.md`](docs/TEST_STRATEGY.md)
 - 배포 절차: [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md)
 - 시연 절차: [`docs/DEMO_RUNBOOK.md`](docs/DEMO_RUNBOOK.md)
