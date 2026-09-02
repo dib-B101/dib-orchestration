@@ -1,0 +1,44 @@
+name: Reusable GitLab integration build
+
+on:
+  workflow_call:
+    inputs:
+      target_branch:
+        description: Integrated GitLab branch to build
+        required: true
+        type: string
+    secrets:
+      GITLAB_MIRROR_USERNAME:
+        required: true
+      GITLAB_MIRROR_TOKEN:
+        required: true
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Build integrated ${{ inputs.target_branch }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    concurrency:
+      group: gitlab-integration-${{ inputs.target_branch }}
+      cancel-in-progress: false
+
+    steps:
+      - name: Check out orchestration and components
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.target_branch }}
+          fetch-depth: 0
+          submodules: recursive
+          persist-credentials: false
+
+      - name: Build and push integrated branch
+        shell: bash
+        env:
+          TARGET_BRANCH: ${{ inputs.target_branch }}
+          GITLAB_MIRROR_URL: https://lab.ssafy.com/s15-bigdata-recom-sub1/S15P21B101.git
+          GITLAB_MIRROR_USERNAME: ${{ secrets.GITLAB_MIRROR_USERNAME }}
+          GITLAB_MIRROR_TOKEN: ${{ secrets.GITLAB_MIRROR_TOKEN }}
+        run: bash scripts/gitlab-sync/build-integration.sh

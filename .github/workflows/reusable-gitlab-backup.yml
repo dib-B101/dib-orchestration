@@ -1,0 +1,51 @@
+name: Reusable GitLab backup
+
+on:
+  workflow_call:
+    inputs:
+      namespace:
+        description: GitLab ref namespace for the source repository
+        required: true
+        type: string
+      tools_ref:
+        description: dib-orchestration ref containing the synchronization scripts
+        required: false
+        default: main
+        type: string
+    secrets:
+      GITLAB_MIRROR_USERNAME:
+        required: true
+      GITLAB_MIRROR_TOKEN:
+        required: true
+
+permissions:
+  contents: read
+
+jobs:
+  backup:
+    name: Reconcile ${{ inputs.namespace }} refs
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    concurrency:
+      group: gitlab-backup-${{ github.repository }}
+      cancel-in-progress: false
+
+    steps:
+      - name: Check out synchronization tools
+        uses: actions/checkout@v4
+        with:
+          repository: dib-B101/dib-orchestration
+          ref: ${{ inputs.tools_ref }}
+          path: sync-tools
+          sparse-checkout: scripts/gitlab-sync
+          persist-credentials: false
+
+      - name: Reconcile GitLab backup refs
+        shell: bash
+        env:
+          NAMESPACE: ${{ inputs.namespace }}
+          SOURCE_REPOSITORY_URL: https://github.com/${{ github.repository }}.git
+          GITLAB_MIRROR_URL: https://lab.ssafy.com/s15-bigdata-recom-sub1/S15P21B101.git
+          GITLAB_MIRROR_USERNAME: ${{ secrets.GITLAB_MIRROR_USERNAME }}
+          GITLAB_MIRROR_TOKEN: ${{ secrets.GITLAB_MIRROR_TOKEN }}
+        run: bash sync-tools/scripts/gitlab-sync/reconcile-backup.sh
