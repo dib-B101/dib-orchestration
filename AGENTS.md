@@ -8,6 +8,7 @@
 ## Start Here
 
 - 시스템 경계와 의존성: `ARCHITECTURE.md`
+- 하네스 문서 준비 상태와 미결정 정보: `docs/HARNESS_STATUS.md`
 - 제품 명세 목록: `docs/product-specs/index.md`
 - 설계 문서 목록: `docs/design-docs/index.md`
 - 작업 계획 규칙: `docs/PLANS.md`

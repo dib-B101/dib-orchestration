@@ -29,6 +29,7 @@ git submodule update --init --recursive
 - 에이전트 작업 지도: [`AGENTS.md`](AGENTS.md)
 - 시스템 구조: [`ARCHITECTURE.md`](ARCHITECTURE.md)
 - 제품 명세: [`docs/product-specs/index.md`](docs/product-specs/index.md)
+- 하네스 문서 상태: [`docs/HARNESS_STATUS.md`](docs/HARNESS_STATUS.md)
 - 설계 문서: [`docs/design-docs/index.md`](docs/design-docs/index.md)
 - 실행 계획: [`docs/PLANS.md`](docs/PLANS.md)
 - Git Flow 정책: [`docs/GIT_FLOW.md`](docs/GIT_FLOW.md)
