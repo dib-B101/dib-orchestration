@@ -26,6 +26,23 @@
 2. TBD
 3. TBD
 
+## 로컬 통합 실행
+
+배포 환경 확정 전에는 루트 Docker Compose로 PostgreSQL, Redis, Kafka, Spring Boot,
+FastAPI를 함께 검증한다.
+
+1. 루트의 `.env.example`을 `.env`로 복사하고 필수 HMAC 키를 채운다.
+2. `docker compose --profile app up -d --build`로 전체 서비스를 실행한다.
+3. `docker compose --profile app ps`에서 `backend`와 `ai`를 포함한 모든 서비스가
+   healthy인지 확인한다.
+4. `GET http://localhost:8000/reco/health`에서 추천 provider가 `postgres`인지 확인한다.
+5. `GET http://localhost:8080/actuator/health`와
+   `GET http://localhost:8080/api/v1/auctions/recommendation?size=10`을 smoke test한다.
+
+Android 프론트엔드는 컨테이너에 넣지 않는다. Android Studio의 debug 빌드가
+`adb reverse tcp:8080 tcp:8080`을 실행하므로 앱은 `127.0.0.1:8080`으로
+호스트에 공개된 백엔드에 접속한다.
+
 ## 배포 확인
 
 - 모든 컴포넌트가 정상 상태인지 확인한다.
