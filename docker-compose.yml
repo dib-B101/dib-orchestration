@@ -103,10 +103,14 @@ services:
       SWEETTRACKER_KEY: ${SWEETTRACKER_KEY:-}
       # AI 연동. 컨테이너끼리는 서비스 이름으로 찾는다
       DIB_AI_ENABLED: "true"
+      DIB_AI_MODERATION_ENABLED: "false"
       DIB_AI_BASE_URL: http://ai:8000
       DIB_AI_CALLBACK_BASE_URL: http://backend:8080
       DIB_SERVICE_HMAC_SECRET: ${DIB_SERVICE_HMAC_SECRET:?DIB_SERVICE_HMAC_SECRET 이 .env 에 없습니다}
       DIB_AI_HMAC_SECRET: ${DIB_AI_HMAC_SECRET:?DIB_AI_HMAC_SECRET 이 .env 에 없습니다}
+      DIB_STORAGE_INTERNAL_BASE_URL: http://backend:8080
+    volumes:
+      - product_images:/app/data/product-images
     depends_on:
       postgres: { condition: service_healthy }
       redis: { condition: service_healthy }
@@ -147,3 +151,4 @@ services:
 
 volumes:
   pgdata:
+  product_images:
