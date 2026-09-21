@@ -96,6 +96,9 @@ services:
       LIVEKIT_API_SECRET: ${LIVEKIT_API_SECRET:-}
       PHONE_VERIFICATION_HMAC_SECRET: ${PHONE_VERIFICATION_HMAC_SECRET:?PHONE_VERIFICATION_HMAC_SECRET 이 .env 에 없습니다}
       PASSWORD_RESET_PAGE_URL: ${PASSWORD_RESET_PAGE_URL:-http://localhost:5173/password/reset}
+      KAKAO_CLIENT_ID: ${KAKAO_CLIENT_ID:-}
+      KAKAO_CLIENT_SECRET: ${KAKAO_CLIENT_SECRET:-}
+      KAKAO_REDIRECT_URIS: ${KAKAO_REDIRECT_URIS:-}
       TOSS_SECRET_KEY: ${TOSS_SECRET_KEY:-}
       CARRIER_PROVIDER: ${CARRIER_PROVIDER:-fake}
       DELIVERY_TRACKER_CLIENT_ID: ${DELIVERY_TRACKER_CLIENT_ID:-}
@@ -103,7 +106,8 @@ services:
       SWEETTRACKER_KEY: ${SWEETTRACKER_KEY:-}
       # AI 연동. 컨테이너끼리는 서비스 이름으로 찾는다
       DIB_AI_ENABLED: "true"
-      DIB_AI_MODERATION_ENABLED: "false"
+      # 상품 등록·수정 시 AI 규칙 검수 후 자동 승인/반려/관리자 보류 큐로 보낸다
+      DIB_AI_MODERATION_ENABLED: "true"
       DIB_AI_BASE_URL: http://ai:8000
       DIB_AI_CALLBACK_BASE_URL: http://backend:8080
       DIB_SERVICE_HMAC_SECRET: ${DIB_SERVICE_HMAC_SECRET:?DIB_SERVICE_HMAC_SECRET 이 .env 에 없습니다}
@@ -140,6 +144,10 @@ services:
       DIB_CALLBACK_ALLOWED_HOSTS: backend,localhost,127.0.0.1
       ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
       OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      GEMINI_API_KEY: ${GMS_API_KEY:-}
+      GEMINI_BASE_URL: ${GMS_GEMINI_BASE_URL:-https://generativelanguage.googleapis.com}/${GMS_GEMINI_API_VERSION:-v1beta}
+      MODERATION_PROVIDER: ${MODERATION_PROVIDER:-gemini}
+      MODERATION_MODEL: ${GMS_CHAT_MODEL:-gemini-2.5-flash-lite}
     depends_on:
       postgres: { condition: service_healthy }
     healthcheck:
@@ -148,6 +156,25 @@ services:
       timeout: 5s
       retries: 20
       start_period: 90s
+
+  admin-web:
+    profiles: ["app"]
+    build:
+      context: ./components/frontend/admin-web
+      args:
+        VITE_API_BASE_URL: ${ADMIN_API_BASE_URL:-http://localhost:8080}
+    container_name: dib-admin-web
+    ports:
+      - "${ADMIN_WEB_PORT:-3000}:80"
+    depends_on:
+      backend: { condition: service_healthy }
+    healthcheck:
+      # 배포에서는 /admin 아래에서 서비스되므로 루트는 302 다. 가벼운 전용 경로를 본다
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://127.0.0.1/healthz"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
 
 volumes:
   pgdata:

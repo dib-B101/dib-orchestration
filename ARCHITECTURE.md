@@ -8,7 +8,7 @@
 
 | 컴포넌트 | 경로 | 책임 | 상세 문서 |
 | --- | --- | --- | --- |
-| Frontend | `components/frontend` | 사용자 인터페이스 | `components/frontend/README.md` |
+| Frontend | `components/frontend` | Android 사용자 앱과 React 관리자 콘솔 | `components/frontend/README.md` |
 | Backend | `components/backend` | API와 비즈니스 로직 | `components/backend/README.md` |
 | AI | `components/ai` | AI 서비스와 모델 파이프라인 | `components/ai/README.md` |
 | Infrastructure | `components/infra` | 인프라와 배포 환경 | `components/infra/README.md` |
@@ -24,6 +24,7 @@
 - 통합 계약의 원본은 `docs/contracts/`에서 관리한다.
 - 배포 환경의 실제 구현은 `components/infra`가 소유한다.
 - submodule 커밋은 검증된 시스템 조합을 표현한다.
+- 관리자 브라우저는 AI를 직접 호출하지 않고 JWT로 Backend 관리자 API를 호출한다. 상품 검수 요청과 결과 반영은 Backend가 AI 내부 API를 통해 수행한다.
 
 ## 미결정 사항
 
