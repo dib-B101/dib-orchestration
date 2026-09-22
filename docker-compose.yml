@@ -1,0 +1,181 @@
+# ─────────────────────────────────────────────────────────────
+# DIB 로컬 개발 환경
+#
+#   인프라만 (백엔드는 IDE 에서 local 프로필로 실행)
+#       docker compose up -d
+#
+#   전부 컨테이너로 (백엔드 + AI 까지)
+#       docker compose --profile app up -d --build
+#
+#   종료(데이터 유지)  docker compose down
+#   완전 초기화        docker compose down -v      (스키마는 Flyway 가 재생성)
+#
+# 이 파일은 orchestration 루트에 있다. 빌드 컨텍스트가 components/ 아래 두 곳이라
+# 한쪽 컴포넌트 안에 두면 상위 디렉터리를 컨텍스트로 잡아야 해서다.
+# ─────────────────────────────────────────────────────────────
+# 프로젝트 이름 고정 — 미지정 시 Compose 가 폴더명을 쓰기 때문에
+# 다른 프로젝트와 컨테이너·볼륨 namespace 가 합쳐진다
+name: dib
+
+services:
+  postgres:
+    image: pgvector/pgvector:pg18          # PostgreSQL 18 + pgvector (RDS 18.4와 정합)
+    container_name: dib-postgres
+    environment:
+      POSTGRES_DB: dib
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 1234
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql
+      - ./components/backend/db/init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d dib"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  redis:
+    image: redis:7.2-alpine                # ElastiCache Redis OSS 7.1과 프로토콜 호환
+    container_name: dib-redis
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  kafka:
+    image: apache/kafka:4.1.0              # Kafka 4.x KRaft 단일 브로커
+    container_name: dib-kafka
+    ports:
+      # 호스트(IDE)는 예전 그대로 localhost:9092 를 쓴다. 컨테이너 내부 EXTERNAL 리스너만 29092 로 옮겼다
+      - "${KAFKA_PORT:-9092}:29092"
+    environment:
+      KAFKA_NODE_ID: 1
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka:9093
+      # 리스너를 둘로 나눈 이유: 브로커가 알려주는 주소를 클라이언트가 그대로 다시 접속에 쓴다.
+      # 하나로 두고 localhost 를 알려주면, 같은 네트워크의 백엔드 컨테이너는 그 localhost 를
+      # 자기 자신으로 해석해 연결이 끊긴다
+      KAFKA_LISTENERS: INTERNAL://:9092,EXTERNAL://:29092,CONTROLLER://:9093
+      KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka:9092,EXTERNAL://localhost:${KAFKA_PORT:-9092}
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT,CONTROLLER:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/kafka/bin/kafka-broker-api-versions.sh --bootstrap-server localhost:9092 > /dev/null 2>&1"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+
+  backend:
+    profiles: ["app"]
+    build:
+      context: ./components/backend
+    container_name: dib-backend
+    ports:
+      - "${BACKEND_PORT:-8080}:8080"
+    environment:
+      # local 프로필로 띄운다. prod 에는 SmsSender 구현체가 없어서(둘 다 @Profile("local"))
+      # 컨테이너가 기동 중에 죽는다. local 은 V900 시드도 함께 적용한다
+      SPRING_PROFILES_ACTIVE: local
+      # local 프로필은 접속 주소가 localhost 로 박혀 있다. 컨테이너 이름으로 덮어쓴다
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/dib
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: 1234
+      SPRING_DATA_REDIS_HOST: redis
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      # local 프로필이 기본값 없이 요구한다. 라이브를 안 쓰면 비워 두면 된다
+      LIVEKIT_URL: ${LIVEKIT_URL:-}
+      LIVEKIT_API_KEY: ${LIVEKIT_API_KEY:-}
+      LIVEKIT_API_SECRET: ${LIVEKIT_API_SECRET:-}
+      PHONE_VERIFICATION_HMAC_SECRET: ${PHONE_VERIFICATION_HMAC_SECRET:?PHONE_VERIFICATION_HMAC_SECRET 이 .env 에 없습니다}
+      PASSWORD_RESET_PAGE_URL: ${PASSWORD_RESET_PAGE_URL:-http://localhost:5173/password/reset}
+      KAKAO_CLIENT_ID: ${KAKAO_CLIENT_ID:-}
+      KAKAO_CLIENT_SECRET: ${KAKAO_CLIENT_SECRET:-}
+      KAKAO_REDIRECT_URIS: ${KAKAO_REDIRECT_URIS:-}
+      TOSS_SECRET_KEY: ${TOSS_SECRET_KEY:-}
+      CARRIER_PROVIDER: ${CARRIER_PROVIDER:-fake}
+      DELIVERY_TRACKER_CLIENT_ID: ${DELIVERY_TRACKER_CLIENT_ID:-}
+      DELIVERY_TRACKER_CLIENT_SECRET: ${DELIVERY_TRACKER_CLIENT_SECRET:-}
+      SWEETTRACKER_KEY: ${SWEETTRACKER_KEY:-}
+      # AI 연동. 컨테이너끼리는 서비스 이름으로 찾는다
+      DIB_AI_ENABLED: "true"
+      # 상품 등록·수정 시 AI 규칙 검수 후 자동 승인/반려/관리자 보류 큐로 보낸다
+      DIB_AI_MODERATION_ENABLED: "true"
+      DIB_AI_BASE_URL: http://ai:8000
+      DIB_AI_CALLBACK_BASE_URL: http://backend:8080
+      DIB_SERVICE_HMAC_SECRET: ${DIB_SERVICE_HMAC_SECRET:?DIB_SERVICE_HMAC_SECRET 이 .env 에 없습니다}
+      DIB_AI_HMAC_SECRET: ${DIB_AI_HMAC_SECRET:?DIB_AI_HMAC_SECRET 이 .env 에 없습니다}
+      DIB_STORAGE_INTERNAL_BASE_URL: http://backend:8080
+    volumes:
+      - product_images:/app/data/product-images
+    depends_on:
+      postgres: { condition: service_healthy }
+      redis: { condition: service_healthy }
+      kafka: { condition: service_healthy }
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "--silent", "http://127.0.0.1:8080/actuator/health"]
+      interval: 10s
+      timeout: 3s
+      retries: 30
+      start_period: 60s
+
+  ai:
+    profiles: ["app"]
+    build:
+      context: ./components/ai
+    container_name: dib-ai
+    ports:
+      - "${AI_PORT:-8000}:8000"
+    environment:
+      DIB_DATABASE_URL: postgresql://postgres:1234@postgres:5432/dib
+      DIB_EMBED_DATABASE_URL: postgresql://postgres:1234@postgres:5432/dib
+      # 값은 컨테이너 환경변수로 넣는다. .env 파일을 이미지에 넣지 않기 위해 dotenv 로딩을 끈다
+      DIB_SKIP_DOTENV: "1"
+      DIB_SERVICE_HMAC_SECRET: ${DIB_SERVICE_HMAC_SECRET:?DIB_SERVICE_HMAC_SECRET 이 .env 에 없습니다}
+      DIB_AI_HMAC_SECRET: ${DIB_AI_HMAC_SECRET:?DIB_AI_HMAC_SECRET 이 .env 에 없습니다}
+      # 이걸 안 채우면 AI 가 202 만 주고 콜백을 보내지 않는다. 백엔드의 컨테이너 이름이 들어가야 한다
+      DIB_CALLBACK_ALLOWED_HOSTS: backend,localhost,127.0.0.1
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      GEMINI_API_KEY: ${GMS_API_KEY:-}
+      GEMINI_BASE_URL: ${GMS_GEMINI_BASE_URL:-https://generativelanguage.googleapis.com}/${GMS_GEMINI_API_VERSION:-v1beta}
+      MODERATION_PROVIDER: ${MODERATION_PROVIDER:-gemini}
+      MODERATION_MODEL: ${GMS_CHAT_MODEL:-gemini-2.5-flash-lite}
+    depends_on:
+      postgres: { condition: service_healthy }
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health')\""]
+      interval: 15s
+      timeout: 5s
+      retries: 20
+      start_period: 90s
+
+  admin-web:
+    profiles: ["app"]
+    build:
+      context: ./components/frontend/admin-web
+      args:
+        VITE_API_BASE_URL: ${ADMIN_API_BASE_URL:-http://localhost:8080}
+    container_name: dib-admin-web
+    ports:
+      - "${ADMIN_WEB_PORT:-3000}:80"
+    depends_on:
+      backend: { condition: service_healthy }
+    healthcheck:
+      # 배포에서는 /admin 아래에서 서비스되므로 루트는 302 다. 가벼운 전용 경로를 본다
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://127.0.0.1/healthz"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+
+volumes:
+  pgdata:
+  product_images:
