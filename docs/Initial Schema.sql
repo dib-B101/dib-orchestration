@@ -110,7 +110,7 @@ CREATE TABLE bid (
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
-ALTER TABLE auction 
+ALTER TABLE auction
 ADD CONSTRAINT fk_auction_top_bid FOREIGN KEY (top_bid_id) REFERENCES bid (bid_id),
 ADD CONSTRAINT fk_auction_top_bidder FOREIGN KEY (top_bidder_id) REFERENCES member (member_id);
 

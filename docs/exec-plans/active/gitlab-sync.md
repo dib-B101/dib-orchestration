@@ -37,6 +37,10 @@ GitHub PR, 리뷰, Issue와 Actions 실행 기록의 복제는 범위에 포함�
 - [x] reusable workflow와 orchestration dispatcher 구현
 - [x] 네 컴포넌트 caller workflow 구현
 - [x] 로컬 기능 검증
+- [x] orchestration 공통 workflow를 `main`에 배포
+- [x] 네 컴포넌트 caller workflow를 `main`, `develop`에 배포
+- [x] GitLab namespace 백업 ref와 GitHub 원본 SHA 일치 확인
+- [x] orchestration `develop`의 컴포넌트 포인터 갱신
 - [ ] 문서 및 실행 계획 완료 처리
 
 ## 주요 결정
@@ -61,6 +65,9 @@ GitHub PR, 리뷰, Issue와 Actions 실행 기록의 복제는 범위에 포함�
 - 통합 결과: `.gitmodules` 없음, mode `160000` gitlink 0개 확인
 - 동일 입력 재실행: 통합 branch commit이 추가되지 않는 멱등성 확인
 - literal `glpat-` token 패턴이 변경 파일에 없음을 확인
+- 실제 GitHub Actions: orchestration과 네 컴포넌트의 최초 백업 실행 성공
+- 실제 GitLab 원격: `orch/*`, `fe/*`, `be/*`, `ai/*`, `infra/*` namespace 생성 확인
+- 네 컴포넌트의 `main`, `develop` caller workflow 배포 및 실행 성공
 
 ## 미해결 문제 및 후속 작업
 

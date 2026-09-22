@@ -46,8 +46,7 @@ docker compose --profile app up -d --build
 
 - 에이전트 작업 지도: [`AGENTS.md`](AGENTS.md)
 - 시스템 구조: [`ARCHITECTURE.md`](ARCHITECTURE.md)
-- 제품 명세: [`docs/product-specs/index.md`](docs/product-specs/index.md)
-- 설계 문서: [`docs/design-docs/index.md`](docs/design-docs/index.md)
+- 제품 개요: [`docs/product-specs/index.md`](docs/product-specs/index.md)
 - 실행 계획: [`docs/PLANS.md`](docs/PLANS.md)
 - Git Flow 정책: [`docs/GIT_FLOW.md`](docs/GIT_FLOW.md)
 - GitLab 백업 및 통합 동기화: [`docs/GITLAB_SYNC.md`](docs/GITLAB_SYNC.md)
@@ -56,4 +55,4 @@ docker compose --profile app up -d --build
 - 배포 절차: [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md)
 - 시연 절차: [`docs/DEMO_RUNBOOK.md`](docs/DEMO_RUNBOOK.md)
 
-이 저장소에는 시스템 전체에 적용되는 문서를 둡니다. 컴포넌트 내부 구현 문서는 해당 submodule에서 관리합니다.
+개발 중인 요구사항, API와 ERD는 작업 시점에 제공받은 최신 자료를 사용한다. 이 저장소에는 시스템 전체에 적용되는 경계, 정책과 검증 절차만 두며 컴포넌트 내부 구현 문서는 해당 submodule에서 관리한다.
