@@ -23,6 +23,7 @@
 - [x] Android OAuth 및 가입 흐름 구현
 - [x] 백엔드 Redirect URI 검증 구현
 - [x] 테스트와 문서 갱신
+- [x] 콜백 수신 직후 처리 코루틴이 취소되는 로그인 멈춤 수정
 - [ ] 실제 Kakao 설정을 사용한 Android 통합 검증
 
 ## 결정 기록
@@ -40,6 +41,8 @@
 - PR: `dib-backend#54`, `dib-frontend#223` (squash merge 및 작업 브랜치 삭제 완료).
 - 프론트엔드 Gradle 스크립트 구성 단계는 통과했다. 계약·가입 테스트와 lint/assemble은 로컬 Android SDK가 없어 task 의존성 결정 단계에서 중단됐다.
 - Frontend와 Backend 모두 `git diff --check` 오류 없음(CRLF 변환 경고만 존재).
+- 2026-09-23: Kakao 승인 후 로그인 화면에서 로딩이 멈추는 현상에 대해, `LaunchedEffect(oauthCallbackUri)` 실행 중 콜백 상태를 즉시 비워 효과가 취소되는 경로를 수정했다. 인증 처리 완료 시 콜백 상태와 로딩을 정리하도록 변경했고 `:app:compileDebugKotlin`이 통과했다. AWS 배포 환경에서의 실계정 재검증은 남아 있다.
+- Frontend `develop` 병합 커밋 `979dd5d`(PR `dib-frontend#229`)를 통합 submodule 포인터에 반영했다. 최신 `develop` 기준 `:app:compileDebugKotlin` 및 `git diff --check`가 통과했다.
 
 ## 미해결 문제
 
