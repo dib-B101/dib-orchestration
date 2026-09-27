@@ -43,6 +43,18 @@ Android 프론트엔드는 컨테이너에 넣지 않는다. Android Studio의 d
 `adb reverse tcp:8080 tcp:8080`을 실행하므로 앱은 `127.0.0.1:8080`으로
 호스트에 공개된 백엔드에 접속한다.
 
+### Firebase 휴대전화 인증
+
+- 로컬 Docker 검증은 Firebase 서비스 계정 JSON을 저장소 밖에 둔 뒤 `.env`에
+  `FIREBASE_CREDENTIALS_FILE`의 절대 경로를 설정한다.
+- `docker compose -f docker-compose.yml -f docker-compose.firebase.local.yml --profile app up -d --build backend`로
+  백엔드를 실행한다. override 파일은 키를 컨테이너의 `/run/secrets/firebase-admin.json`에 읽기 전용으로 연결한다.
+- EKS에서는 Firebase 서비스 계정 JSON을 Kubernetes Secret으로 보관하고 백엔드 Pod에 읽기 전용 파일로
+  마운트한다. `GOOGLE_APPLICATION_CREDENTIALS`를 마운트 경로로, `FIREBASE_PROJECT_ID`를 `ssafy-dib`으로 설정한다.
+  로컬 키와 배포 키는 분리한다. Secret 생성과 Pod 변경은 배포 승인을 받은 작업에서 수행한다.
+- 장기적으로 EKS의 Workload Identity Federation을 구성하면 서비스 계정 비공개 키 없이
+  Google 자격증명을 발급받을 수 있다. 이 경우에도 앱의 `GOOGLE_APPLICATION_CREDENTIALS` 경로 계약을 사용한다.
+
 ## 배포 확인
 
 - 모든 컴포넌트가 정상 상태인지 확인한다.

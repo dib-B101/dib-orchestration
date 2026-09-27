@@ -11,7 +11,7 @@
 | 운송장 끝자리 9 = 배송완료 | ✅ (`fake`) | ✅ (`CARRIER_PROVIDER` 미설정 시) |
 | `DUMMY` 택배사 + 시각 운송장 | ✅ (`deliverytracker`) | ✅ (`deliverytracker` 설정 시) |
 | 시드 계정 로그인 (`Test1234!`) | ✅ | ❌ (시드 미적용) |
-| 인증번호 조회 `/dev/sms/...` | ✅ | ❌ → 백엔드 로그에서 확인 |
+| Firebase 테스트 전화번호 | 콘솔에 등록한 번호만 SMS 없이 테스트 | 콘솔 설정에 따름 |
 
 ---
 
@@ -29,15 +29,14 @@
 
 ### 회원가입 (전화 인증 필수)
 
-1. `POST /api/v1/auth/phone-verifications` `{"phoneNumber":"01012345678","purpose":"SIGN_UP"}` → `verificationId`
-   - `purpose`: `SIGN_UP` / `FIND_EMAIL` / `RESET_PASSWORD` / `CHANGE_SENSITIVE`. 빠지면 400.
-2. 인증번호 6자리 확인
-   - 로컬 Docker Compose: 기본 목업 인증번호 `111111` (`PHONE_VERIFICATION_FIXED_CODE`로 변경 가능). `GET /api/v1/dev/sms/{전화번호}/last-code`에서도 확인할 수 있다.
-   - 배포: 문자가 실제로 안 간다. `kubectl logs deploy/dib-backend | Select-String "SMS 발송"` 에서 본다.
-3. `POST /api/v1/auth/phone-verifications/{verificationId}/confirm` `{"code":"111111"}` → `verificationToken` (로컬 Docker Compose 기본값)
-4. `POST /api/v1/auth/signup` 에 `phoneVerificationToken` 포함. 전화번호는 회원당 유일하다 — 새 계정마다 다른 번호.
+1. Android 앱에서 Firebase Phone Auth로 `010` 번호를 인증한다. 실제 번호는 Firebase SMS를 받으며, 콘솔에 등록한 테스트 번호는 지정한 테스트 코드로 확인한다.
+2. 앱이 Firebase ID 토큰을 `POST /api/v1/auth/phone-verifications/firebase`에 `{"idToken":"...","phoneNumber":"01012345678","purpose":"SIGN_UP"}`로 보낸다. `purpose`는 `SIGN_UP` / `FIND_EMAIL` / `RESET_PASSWORD` / `CHANGE_SENSITIVE` 중 하나다.
+3. 백엔드가 Firebase 인증 정보와 번호를 확인하고 목적별 `verificationToken`을 발급한다. `POST /api/v1/auth/signup`에 이 토큰을 포함한다. 전화번호는 회원당 유일하다.
 
-`flow_test.py` 는 `010` + 무작위 8자리, 비밀번호 `Dib!Test1234` 로 매 실행 A/B/C 세 계정을 새로 만든다.
+로컬 백엔드는 `FIREBASE_PROJECT_ID`와 저장소 밖 서비스 계정 자격증명(`GOOGLE_APPLICATION_CREDENTIALS`)이 필요하다. 기존 `/dev/sms` 코드는 Firebase 인증에 사용되지 않는다.
+현재 Firebase 콘솔에는 테스트 번호 `+82 10-9999-9999`, 테스트 코드 `111111`이 등록돼 있다. 앱에는 `01099999999`를 입력한다.
+
+기존 임의 번호 기반 API 시나리오는 Firebase ID 토큰 없이 회원가입할 수 없다. 자동화는 Firebase 콘솔에 등록한 테스트 번호를 사용하고, 번호 중복을 피하도록 시나리오별 테스트 계정을 정리해야 한다.
 
 ---
 

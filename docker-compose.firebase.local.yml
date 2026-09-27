@@ -1,0 +1,12 @@
+# Firebase Phone Auth를 로컬 컨테이너에서 시험할 때만 추가한다.
+# 비공개 키는 저장소 밖에 두고 .env의 FIREBASE_CREDENTIALS_FILE로 경로를 지정한다.
+services:
+  backend:
+    environment:
+      FIREBASE_PROJECT_ID: ${FIREBASE_PROJECT_ID:-ssafy-dib}
+      GOOGLE_APPLICATION_CREDENTIALS: /run/secrets/firebase-admin.json
+    volumes:
+      - type: bind
+        source: ${FIREBASE_CREDENTIALS_FILE:?저장소 밖 Firebase 서비스 계정 JSON 경로가 필요합니다}
+        target: /run/secrets/firebase-admin.json
+        read_only: true
