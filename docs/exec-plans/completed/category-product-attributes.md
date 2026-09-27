@@ -27,17 +27,18 @@
 - [x] 서버 스키마·검증·API 구현
 - [x] Android 동적 입력·상세 표시 구현
 - [x] 검증 및 문서 정리
-- [ ] 컴포넌트 병합과 통합 버전 갱신
+- [x] 컴포넌트 병합과 통합 버전 갱신
 
 ## 검증 결과
 
 - Backend: `ProductAttributeCatalogTest`와 Testcontainers에서 V19 적용·상품 수정·JSONB 저장·상세 조회 테스트 통과.
 - Android: `CategoryProductFieldsTest`, `ProductContractTest`, 기존 payload 호환성 테스트 통과.
 - Backend·Frontend·Orchestration의 `git diff --check` 통과.
+- Backend PR #62는 `0b2034a`로, Frontend PR #240은 `52069d9`로 squash 병합됨. 통합 저장소 포인터를 두 병합 커밋으로 갱신하고 `git submodule status --recursive`로 확인함.
 
-## 미해결 사항
+## 결과와 후속 작업
 
 - Backend PR: https://github.com/dib-B101/dib-backend/pull/62
 - Frontend PR: https://github.com/dib-B101/dib-frontend/pull/240
-- 검증한 컴포넌트 기능 커밋: Backend `92996f8`, Frontend `8ac3d41`.
-- 컴포넌트 PR 병합 뒤 통합 저장소 submodule 포인터를 병합 커밋으로 갱신해야 한다.
+- Backend 병합 커밋: `0b2034a`; Frontend 병합 커밋: `52069d9`.
+- 남은 후속 작업 없음.

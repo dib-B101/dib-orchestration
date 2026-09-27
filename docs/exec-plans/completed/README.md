@@ -6,3 +6,4 @@
 - [`general-live-auction-spec-separation.md`](general-live-auction-spec-separation.md): 일반 경매와 Live 경매의 탐색·수명주기 및 공통 Auction 계약 정리
 - [`auction-harness-docs-refresh.md`](auction-harness-docs-refresh.md): 일반 경매·Live 경매 목표 계약을 핵심 하네스 문서에 반영
 - [`product-registration-review-feedback.md`](product-registration-review-feedback.md): 상품 등록 완료 이동, 검수 알림 및 등록 상품 관리 개선
+- [`category-product-attributes.md`](category-product-attributes.md): 카테고리별 상품 정보 입력·검증과 저장 구조 적용
