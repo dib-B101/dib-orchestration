@@ -31,3 +31,8 @@ temp/
 .cache/
 .coverage
 coverage/
+__pycache__/
+*.py[cod]
+
+# Firebase Admin SDK 서비스 계정 키 — 저장소 밖에만 둔다
+*firebase-admin*.json
