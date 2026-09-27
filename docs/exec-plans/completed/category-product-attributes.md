@@ -42,3 +42,9 @@
 - Frontend PR: https://github.com/dib-B101/dib-frontend/pull/240
 - Backend 병합 커밋: `0b2034a`; Frontend 병합 커밋: `52069d9`.
 - 남은 후속 작업 없음.
+
+## 2026-09-27 카테고리명 정합성 수정
+
+- 로컬 백엔드 컨테이너가 이전 버전이라 `GET /api/v1/categories`에서 `attributeSpecs`를 반환하지 않았고, 앱의 등록 화면에 동적 입력란이 나타나지 않았다.
+- 현재 DB의 19개 카테고리명 중 기존 카탈로그와 이름이 다른 분류를 매핑하고, `예술·창작` 입력 항목을 추가했다. Backend PR #63을 `63d8f7b`로 병합하고 통합 저장소의 backend 포인터를 해당 커밋으로 갱신했다.
+- Backend `ProductAttributeCatalogTest` 통과. Firebase 로컬 설정을 유지한 채 Docker 백엔드를 재빌드한 뒤 카테고리 19개 모두 `attributeSpecs`가 있는지 확인했다. Android 에뮬레이터에서 디지털기기 → 예술·창작 변경 시 입력란이 브랜드·모델명·출시연도에서 작가·제작자·재료·기법·크기로 바뀌는 것을 확인했다.
