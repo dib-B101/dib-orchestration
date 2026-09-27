@@ -34,4 +34,4 @@
 - 인프라: `bootstrap.ps1`, `deploy.ps1` PowerShell 구문 검사 통과. Terraform CLI가 없어 HCL fmt/validate는 실행하지 못했다.
 - `git diff --submodule=log`와 `git submodule status --recursive`로 컴포넌트 커밋을 검토했다.
 - 실제 Gmail 발송과 단말 App Link 연결은 SMTP 환경 변수 주입 및 인프라 적용 후 확인해야 한다. 비밀값은 저장소에 기록하지 않았다.
-- 컴포넌트 feature 브랜치의 develop 병합 후 orchestration submodule 포인터를 갱신한다.
+- 컴포넌트 develop 병합 버전: backend `f2f582d` (#64), frontend `7b0a765` (#247), infra `2270ac3` (#5). Orchestration submodule 포인터는 해당 저장소의 최신 develop 커밋으로 갱신한다.
