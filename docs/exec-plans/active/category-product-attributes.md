@@ -31,10 +31,8 @@
 
 ## 검증 결과
 
-- Backend: `ProductAttributeCatalogTest` 통과. Testcontainers에서 V19 적용 후 상품 수정·JSONB 저장·상세 조회 통과.
+- Backend: `ProductAttributeCatalogTest`와 Testcontainers에서 V19 적용·상품 수정·JSONB 저장·상세 조회 테스트 통과.
 - Android: `CategoryProductFieldsTest`, `ProductContractTest`, 기존 payload 호환성 테스트 통과.
-- 최종 변경분으로 Backend `ProductAttributeCatalogTest`와 Testcontainers 상품 저장·조회 테스트 통과.
-- 최종 변경분으로 Android `CategoryProductFieldsTest`와 `ProductContractTest` 통과.
 - Backend·Frontend·Orchestration의 `git diff --check` 통과.
 
 ## 미해결 사항
