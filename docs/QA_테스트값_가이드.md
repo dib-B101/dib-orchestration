@@ -32,9 +32,9 @@
 1. `POST /api/v1/auth/phone-verifications` `{"phoneNumber":"01012345678","purpose":"SIGN_UP"}` → `verificationId`
    - `purpose`: `SIGN_UP` / `FIND_EMAIL` / `RESET_PASSWORD` / `CHANGE_SENSITIVE`. 빠지면 400.
 2. 인증번호 6자리 확인
-   - 로컬: `GET /api/v1/dev/sms/{전화번호}/last-code`
+   - 로컬 Docker Compose: 기본 목업 인증번호 `111111` (`PHONE_VERIFICATION_FIXED_CODE`로 변경 가능). `GET /api/v1/dev/sms/{전화번호}/last-code`에서도 확인할 수 있다.
    - 배포: 문자가 실제로 안 간다. `kubectl logs deploy/dib-backend | Select-String "SMS 발송"` 에서 본다.
-3. `POST /api/v1/auth/phone-verifications/{verificationId}/confirm` `{"code":"123456"}` → `verificationToken`
+3. `POST /api/v1/auth/phone-verifications/{verificationId}/confirm` `{"code":"111111"}` → `verificationToken` (로컬 Docker Compose 기본값)
 4. `POST /api/v1/auth/signup` 에 `phoneVerificationToken` 포함. 전화번호는 회원당 유일하다 — 새 계정마다 다른 번호.
 
 `flow_test.py` 는 `010` + 무작위 8자리, 비밀번호 `Dib!Test1234` 로 매 실행 A/B/C 세 계정을 새로 만든다.

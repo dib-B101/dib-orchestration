@@ -25,6 +25,7 @@ Copy-Item .env.example .env
 
 ```properties
 PHONE_VERIFICATION_HMAC_SECRET=<랜덤 문자열>
+PHONE_VERIFICATION_FIXED_CODE=111111
 DIB_SERVICE_HMAC_SECRET=<랜덤 문자열>
 DIB_AI_HMAC_SECRET=<다른 랜덤 문자열>
 TOSS_SECRET_KEY=<토스 테스트 시크릿 키>
