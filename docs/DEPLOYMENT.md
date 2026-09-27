@@ -2,6 +2,9 @@
 
 단기 프로젝트 환경을 재현 가능하게 배포하고 상태를 확인하기 위한 절차를 관리한다.
 
+QA 배포는 수동 Gradle 명령 대신 [QA 배포 하네스](DEPLOYMENT_HARNESS.md)를 단일 진입점으로 사용한다.
+이 하네스가 AWS 주소, Flyway V901, Pod image digest, 외부 API와 APK DEX를 모두 검증하고 증적 JSON을 만든다.
+
 ## 배포 대상
 
 | 항목 | 값 |
@@ -49,9 +52,11 @@ Android 프론트엔드는 컨테이너에 넣지 않는다. Android Studio의 d
   `FIREBASE_CREDENTIALS_FILE`의 절대 경로를 설정한다.
 - `docker compose -f docker-compose.yml -f docker-compose.firebase.local.yml --profile app up -d --build backend`로
   백엔드를 실행한다. override 파일은 키를 컨테이너의 `/run/secrets/firebase-admin.json`에 읽기 전용으로 연결한다.
-- EKS에서는 Firebase 서비스 계정 JSON을 Kubernetes Secret으로 보관하고 백엔드 Pod에 읽기 전용 파일로
-  마운트한다. `GOOGLE_APPLICATION_CREDENTIALS`를 마운트 경로로, `FIREBASE_PROJECT_ID`를 `ssafy-dib`으로 설정한다.
-  로컬 키와 배포 키는 분리한다. Secret 생성과 Pod 변경은 배포 승인을 받은 작업에서 수행한다.
+- EKS에서는 Firebase 서비스 계정 JSON을 Kubernetes Secret `dib-firebase-admin`(키 `firebase-admin.json`)으로 보관하고
+  백엔드 Pod에 `/var/run/secrets/firebase/firebase-admin.json`으로 읽기 전용 마운트한다(`components/infra/infra/k8s/spring.yaml`).
+  Pod 환경변수는 `FIREBASE_PROJECT_ID=ssafy-dib`, `GOOGLE_APPLICATION_CREDENTIALS=/var/run/secrets/firebase/firebase-admin.json`이다.
+  Secret은 `components/infra/scripts/bootstrap.ps1`이 저장소 밖 `$HOME\.dib-firebase-admin.json`에서 만들고,
+  `deploy.ps1`은 Secret이 없으면 적용 전에 멈춘다. 키 파일은 어떤 저장소에도 커밋하지 않는다.
 - 장기적으로 EKS의 Workload Identity Federation을 구성하면 서비스 계정 비공개 키 없이
   Google 자격증명을 발급받을 수 있다. 이 경우에도 앱의 `GOOGLE_APPLICATION_CREDENTIALS` 경로 계약을 사용한다.
 
