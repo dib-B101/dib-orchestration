@@ -69,6 +69,8 @@ DIB_SESSION_IDLE_TIMEOUT_MINUTES=30
 테스트 번호는 실제 SMS를 보내지 않으며 Firebase 사용량 할당량을 차감하지 않는다.
 실제 번호로 SMS를 보내려면 Firebase 프로젝트에 결제 계정을 연결해 Blaze 요금제를 사용해야 한다.
 Spark 요금제에서는 Firebase가 `BILLING_NOT_ENABLED`로 SMS 요청을 거부한다.
+로컬 Android 에뮬레이터에서 Play Integrity 앱 확인이 실패하면 디버그 빌드는 Firebase의
+reCAPTCHA 앱 확인 경로를 사용한다. 브라우저 확인 화면이 열릴 수 있으며 릴리스 빌드에는 적용되지 않는다.
 
 ## 7. `127.0.0.1` 사용 시 디바이스별 설정
 

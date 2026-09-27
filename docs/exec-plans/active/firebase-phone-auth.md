@@ -43,4 +43,5 @@
 - Docker 백엔드의 `/actuator/health`가 HTTP 200을 반환하고 서비스 계정 키가 읽기 전용으로 연결된 것을 확인했다.
 - 백엔드의 기존 수정은 `75c8139`, Firebase 인증은 `10a48a5`로 커밋했다. Android Firebase 인증은 `b22052f`로 커밋했다. 세 커밋의 작업 브랜치를 원격에 푸시했다.
 - Firebase 테스트 번호는 실제 SMS를 보내지 않아 사용량이 증가하지 않는다. 실제 번호로 로컬 요청한 결과 에뮬레이터 로그에 `17499 BILLING_NOT_ENABLED`가 확인됐다. 현재 Spark 프로젝트에서 실제 SMS를 사용하려면 결제 계정을 연결해 Blaze로 전환해야 한다. 요금제 변경은 수행하지 않았다.
+- 사용자 전환 후 Firebase 콘솔에서 Blaze 요금제를 확인했다. 이후 로컬 에뮬레이터의 실제 번호 요청은 `17028 Invalid app info in play_integrity_token`으로 실패했다. 설치 APK의 SHA-1·SHA-256과 Firebase 등록값이 일치함을 확인하고, 디버그 에뮬레이터에서만 reCAPTCHA 앱 확인을 사용하도록 수정했다.
 - 배포 환경의 Firebase Admin SDK 자격증명은 EKS Secret 또는 Workload Identity Federation으로 별도 준비해야 한다. 이번 작업에서는 배포 설정을 변경하지 않았다.
