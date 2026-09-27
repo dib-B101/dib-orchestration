@@ -66,6 +66,10 @@ DIB_SESSION_IDLE_TIMEOUT_MINUTES=30
 5. Android API 37 에뮬레이터에서는 로컬 네트워크 권한을 허용한다.
 6. Firebase 콘솔에 등록한 테스트 번호 `+82 10-9999-9999`와 코드 `111111`로 인증 흐름을 확인한다.
 
+테스트 번호는 실제 SMS를 보내지 않으며 Firebase 사용량 할당량을 차감하지 않는다.
+실제 번호로 SMS를 보내려면 Firebase 프로젝트에 결제 계정을 연결해 Blaze 요금제를 사용해야 한다.
+Spark 요금제에서는 Firebase가 `BILLING_NOT_ENABLED`로 SMS 요청을 거부한다.
+
 ## 7. `127.0.0.1` 사용 시 디바이스별 설정
 
 ```powershell
