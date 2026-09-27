@@ -46,3 +46,4 @@
 - 카테고리 상태는 화면의 back stack entry에 속한 ViewModel에 보관해 상품 상세에서 돌아온 뒤 재조회로 목록이 바뀌지 않도록 구성.
 - orchestration의 컴포넌트 포인터는 프론트엔드 PR 병합 전까지 갱신하지 않는다.
 - 프론트엔드 `87d7f32`를 `hotfix/qa-ui-trades`에 푸시하고 [draft PR #227](https://github.com/dib-B101/dib-frontend/pull/227)을 생성했다.
+- 재검토에서 일반 상품 목록 API에는 경매 ID가 없음을 확인했다. 같은 카테고리의 활성 경매 검색 API를 사용하도록 `51c2e5c`에서 수정하고 푸시했다.
