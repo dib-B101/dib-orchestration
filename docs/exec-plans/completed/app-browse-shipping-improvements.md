@@ -36,4 +36,4 @@
 - Android `:app:assembleDebug` 통과. 개발용 에뮬레이터에서 홈 카테고리 19개 표시 확인.
 - 로컬 API는 19개 카테고리를 반환했으나 기존 에뮬레이터 화면은 8개 임시 목록을 표시했다. 수정 후 서버 응답 19개를 표시한다.
 - 새 address 컬럼을 사용하는 실제 주문 저장 흐름은 백엔드 마이그레이션 적용 이후 함께 확인해야 한다.
-- 컴포넌트 버전: backend `fca5fd7` (address 테스트 통과), frontend `99ac929` (단위 테스트·debug APK 빌드 통과).
+- 컴포넌트 develop 병합 버전: backend `d8843e7` (#65), frontend `8ae6636` (#248).
