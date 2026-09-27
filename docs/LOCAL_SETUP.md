@@ -25,17 +25,25 @@ Copy-Item .env.example .env
 
 ```properties
 PHONE_VERIFICATION_HMAC_SECRET=<랜덤 문자열>
-PHONE_VERIFICATION_FIXED_CODE=111111
 DIB_SERVICE_HMAC_SECRET=<랜덤 문자열>
 DIB_AI_HMAC_SECRET=<다른 랜덤 문자열>
 TOSS_SECRET_KEY=<토스 테스트 시크릿 키>
 ```
 
+Firebase 휴대전화 인증을 시험할 때는 Firebase 콘솔에서 등록한 Android 앱의
+`google-services.json`이 `components/frontend/app/`에 있는지 확인한다.
+Firebase Admin SDK 서비스 계정 JSON은 저장소 밖에 보관하고 `.env`에 다음 값을 추가한다.
+
+```properties
+FIREBASE_PROJECT_ID=ssafy-dib
+FIREBASE_CREDENTIALS_FILE=C:/Users/<사용자>/.config/dib/firebase-admin-local.json
+```
+
 ## 4. 서버 실행
 
 ```powershell
-docker compose --profile app up -d --build
-docker compose --profile app ps
+docker compose -f docker-compose.yml -f docker-compose.firebase.local.yml --profile app up -d --build
+docker compose -f docker-compose.yml -f docker-compose.firebase.local.yml --profile app ps
 ```
 
 ## 5. Android 로컬 설정
@@ -56,6 +64,7 @@ DIB_SESSION_IDLE_TIMEOUT_MINUTES=30
 3. Android Emulator를 실행한다.
 4. `app` 구성을 실행한다.
 5. Android API 37 에뮬레이터에서는 로컬 네트워크 권한을 허용한다.
+6. Firebase 콘솔에 등록한 테스트 번호 `+82 10-9999-9999`와 코드 `111111`로 인증 흐름을 확인한다.
 
 ## 7. `127.0.0.1` 사용 시 디바이스별 설정
 

@@ -78,11 +78,11 @@ services:
     build:
       context: ./components/backend
     container_name: dib-backend
+    restart: on-failure
     ports:
       - "${BACKEND_PORT:-8080}:8080"
     environment:
-      # local 프로필로 띄운다. prod 에는 SmsSender 구현체가 없어서(둘 다 @Profile("local"))
-      # 컨테이너가 기동 중에 죽는다. local 은 V900 시드도 함께 적용한다
+      # local 프로필은 V900 시드를 함께 적용한다.
       SPRING_PROFILES_ACTIVE: local
       # local 프로필은 접속 주소가 localhost 로 박혀 있다. 컨테이너 이름으로 덮어쓴다
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/dib
@@ -95,7 +95,6 @@ services:
       LIVEKIT_API_KEY: ${LIVEKIT_API_KEY:-}
       LIVEKIT_API_SECRET: ${LIVEKIT_API_SECRET:-}
       PHONE_VERIFICATION_HMAC_SECRET: ${PHONE_VERIFICATION_HMAC_SECRET:?PHONE_VERIFICATION_HMAC_SECRET 이 .env 에 없습니다}
-      PHONE_VERIFICATION_FIXED_CODE: ${PHONE_VERIFICATION_FIXED_CODE:-111111}
       PASSWORD_RESET_PAGE_URL: ${PASSWORD_RESET_PAGE_URL:-http://localhost:5173/password/reset}
       KAKAO_CLIENT_ID: ${KAKAO_CLIENT_ID:-}
       KAKAO_CLIENT_SECRET: ${KAKAO_CLIENT_SECRET:-}
