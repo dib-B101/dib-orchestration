@@ -41,4 +41,5 @@
 
 - Backend PR: https://github.com/dib-B101/dib-backend/pull/62
 - Frontend PR: https://github.com/dib-B101/dib-frontend/pull/240
+- 검증한 컴포넌트 기능 커밋: Backend `92996f8`, Frontend `8ac3d41`.
 - 컴포넌트 PR 병합 뒤 통합 저장소 submodule 포인터를 병합 커밋으로 갱신해야 한다.
